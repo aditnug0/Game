@@ -152,6 +152,10 @@ socket.on('updatePlayers', (backEndPlayers) => {
   }
 })
 
+socket.on('eliminationNotification', (data) => {
+  alert(data.message); // Menampilkan notifikasi eliminasi
+});
+
 let animationId
 function animate() {
   animationId = requestAnimationFrame(animate)
@@ -290,10 +294,21 @@ socket.on('updateScore', (score) => {
 document.querySelector('#usernameForm').addEventListener('submit', (event) => {
   event.preventDefault()
   document.querySelector('#usernameForm').style.display = 'none'
-  socket.emit('initGame', {
-    width: canvas.width,
-    height: canvas.height,
-    devicePixelRatio,
-    username: document.querySelector('#usernameInput').value
+   const user = document.querySelector('#usernameInput').value
+
+   //hadle username empty
+  if (user == null || user == ""  ){
+    alert("Username is empty")
+    window.location.href = '/'
+  }
+  else{
+    socket.emit('initGame', {
+      width: canvas.width,
+      height: canvas.height,
+      devicePixelRatio,
+      username: user
+    })
+  }
   })
-})
+
+  

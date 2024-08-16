@@ -24,6 +24,7 @@ const RADIUS = 10
 const PROJECTILE_RADIUS = 5
 let projectileId = 0
 
+// hadle coin in canvas
 function generateCoin() {
 
   if (Object.keys(backEndCoins).length >= 2){
@@ -38,8 +39,7 @@ function generateCoin() {
   };
 
 }
-
-// Menggenerate koin setiap 10 detik (interval bisa diatur)
+// Menggenerate koin setiap 15 detik (interval bisa diatur)
 setInterval(generateCoin, 15000);
 
 
@@ -50,6 +50,7 @@ io.on('connection', (socket) => {
 
   io.emit('updatePlayers', backEndPlayers)
 
+  // hadle shoot player
   socket.on('shoot', ({ x, y, angle }) => {
     projectileId++
 
@@ -68,6 +69,7 @@ io.on('connection', (socket) => {
     console.log(backEndProjectiles)
   })
 
+  // hadle mulai game
   socket.on('initGame', ({ username, width, height }) => {
     backEndPlayers[socket.id] = {
       x: 1024 * Math.random(),
@@ -87,12 +89,14 @@ io.on('connection', (socket) => {
     backEndPlayers[socket.id].radius = RADIUS
   })
 
+  // hadle player disconnect
   socket.on('disconnect', (reason) => {
     console.log(reason)
     delete backEndPlayers[socket.id]
     io.emit('updatePlayers', backEndPlayers)
   })
 
+  // hadle key AWSD 
   socket.on('keydown', ({ keycode, sequenceNumber }) => {
     const backEndPlayer = backEndPlayers[socket.id]
 
@@ -136,7 +140,9 @@ io.on('connection', (socket) => {
   })
 })
 
-// backend ticker
+
+// pengaturan logic game
+
 setInterval(() => {
   // update projectile positions
   for (const id in backEndProjectiles) {
@@ -156,6 +162,8 @@ setInterval(() => {
       continue
     }
 
+
+// logic kill player
     for (const playerId in backEndPlayers) {
       const backEndPlayer = backEndPlayers[playerId]
 
@@ -169,8 +177,14 @@ setInterval(() => {
         DISTANCE < PROJECTILE_RADIUS + backEndPlayer.radius &&
         backEndProjectiles[id].playerId !== playerId
       ) {
+        const eliminatedPlayerId = playerId
         if (backEndPlayers[backEndProjectiles[id].playerId])
           backEndPlayers[backEndProjectiles[id].playerId].score++
+
+        // notif eliminasi
+        io.to(eliminatedPlayerId).emit('eliminationNotification', { message: `You have been eliminated! from ${backEndPlayer.username}` });
+
+        // Hapus pemain dan proyektil
 
         console.log(backEndPlayers[backEndProjectiles[id].playerId])
         delete backEndProjectiles[id]
@@ -180,6 +194,7 @@ setInterval(() => {
     }
   }
 
+// logic untuk koin
   for (const coinId in backEndCoins) {
     for (const playerId in backEndPlayers) {
       const backEndPlayer = backEndPlayers[playerId];
@@ -198,12 +213,14 @@ setInterval(() => {
     }
   }
 
+  // update ke klien untuk realtime 
   io.emit('updateProjectiles', backEndProjectiles)
   io.emit('updatePlayers', backEndPlayers)
   io.emit('updateCoins', backEndCoins)
 
 }, 15)
 
+// Port server
 server.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
