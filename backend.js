@@ -5,6 +5,7 @@ const app = express()
 const http = require('http')
 const server = http.createServer(app)
 const { Server } = require('socket.io')
+const { CLIENT_RENEG_LIMIT } = require('tls')
 const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000 })
 
 const port = 3000
@@ -182,11 +183,10 @@ setInterval(() => {
           backEndPlayers[backEndProjectiles[id].playerId].score++
 
         // notif eliminasi
-        io.to(eliminatedPlayerId).emit('eliminationNotification', { message: `You have been eliminated! from ${backEndPlayer.username}` });
+        io.to(eliminatedPlayerId).emit('eliminationNotification', { message: `You have been eliminated! by ${backEndPlayers[backEndProjectiles[id].playerId].username}` });
 
         // Hapus pemain dan proyektil
-
-        console.log(backEndPlayers[backEndProjectiles[id].playerId])
+        console.log(backEndPlayers[backEndProjectiles[id].playerId ])
         delete backEndProjectiles[id]
         delete backEndPlayers[playerId]
         break
