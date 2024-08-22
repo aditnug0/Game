@@ -150,11 +150,29 @@ socket.on('updatePlayers', (backEndPlayers) => {
       delete frontEndPlayers[id]
     }
   }
+
+  for (const playerId in backEndPlayers) {
+    const player = backEndPlayers[playerId];
+    // Update the player color in your frontend canvas/DOM
+    updatePlayerColor(playerId, player.color);
+  }
+
+
 })
 
 socket.on('eliminationNotification', (data) => {
   alert(data.message); // Menampilkan notifikasi eliminasi
 });
+
+function updatePlayerColor(playerId, color) {
+  // Pastikan frontEndPlayers sudah ada di frontend dan memiliki struktur yang benar
+  if (frontEndPlayers[playerId]) {
+    frontEndPlayers[playerId].color = color; // Update color in the frontEndPlayers object
+
+    // Contoh: jika ada metode draw() pada objek Player
+    frontEndPlayers[playerId].draw(); // Redraw player with new color
+  }
+}
 
 let animationId
 function animate() {

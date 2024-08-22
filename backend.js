@@ -41,7 +41,7 @@ function generateCoin() {
 
 }
 // Menggenerate koin setiap 15 detik (interval bisa diatur)
-setInterval(generateCoin, 15000);
+setInterval(generateCoin, 10000);
 
 
 
@@ -194,7 +194,14 @@ setInterval(() => {
     }
   }
 
-// logic untuk koin
+  // logic untuk player tabrakan
+
+
+
+
+
+// logic untuk koin dan ganti warna
+let collectId  // untuk menampung id player pick coin 
   for (const coinId in backEndCoins) {
     for (const playerId in backEndPlayers) {
       const backEndPlayer = backEndPlayers[playerId];
@@ -207,8 +214,19 @@ setInterval(() => {
       if (DISTANCE < backEndPlayer.radius + backEndCoins[coinId].radius) {
         // Pemain mengambil koin
         backEndPlayer.score += 10; // Tambah skor 10 untuk pengambilan koin
+        collectId = playerId
+        console.log(collectId)
         delete backEndCoins[coinId]; // Hapus koin
         break;
+      }
+    }
+    if (collectId) break
+  }
+  if (collectId){
+    for (const playerId in backEndPlayers){
+      if(playerId !== collectId){
+        backEndPlayers[playerId].color =`hsl(${360 * Math.random()}, 100%, 50%)`;
+        console.log(`Player ${playerId} new color: ${backEndPlayers[playerId].color}`);
       }
     }
   }
