@@ -87,6 +87,10 @@ socket.on('updatePlayers', (backEndPlayers) => {
         '#playerLabels'
       ).innerHTML += `<div data-id="${id}" data-score="${backEndPlayer.score}">${backEndPlayer.username}: ${backEndPlayer.score}</div>`
     } else {
+
+      frontEndPlayers[id].x = backEndPlayer.x
+      frontEndPlayers[id].y = backEndPlayer.y
+
       document.querySelector(
         `div[data-id="${id}"]`
       ).innerHTML = `${backEndPlayer.username}: ${backEndPlayer.score}`
@@ -151,14 +155,18 @@ socket.on('updatePlayers', (backEndPlayers) => {
     }
   }
 
+  // hadle player pick koin and change color
   for (const playerId in backEndPlayers) {
     const player = backEndPlayers[playerId];
-    // Update the player color in your frontend canvas/DOM
+    // Update the player color in your frontend canvas
     updatePlayerColor(playerId, player.color);
   }
 
-
 })
+
+socket.on('collision', ({ player1, player2 }) => {
+  console.log(`Collision detected between ${player1} and ${player2}`);
+});
 
 socket.on('eliminationNotification', (data) => {
   alert(data.message); // Menampilkan notifikasi eliminasi

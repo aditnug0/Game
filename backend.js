@@ -195,6 +195,41 @@ setInterval(() => {
   }
 
   // logic untuk player tabrakan
+  for (const playerId1 in backEndPlayers) {
+    for (const playerId2 in backEndPlayers) {
+      if (playerId1 !== playerId2) {
+        const player1 = backEndPlayers[playerId1];
+        const player2 = backEndPlayers[playerId2];
+  
+        const DISTANCE = Math.hypot(player1.x - player2.x, player1.y - player2.y);
+        const COMBINED_RADIUS = player1.radius + player2.radius;
+  
+        if (DISTANCE < COMBINED_RADIUS) {
+          // Hitung diagonal x dan y player
+          const dx = player1.x - player2.x;
+          const dy = player1.y - player2.y;
+  
+          // Hitung sudut pantulan
+          const angle = Math.atan2(dy, dx);
+          const bounceBackDistance = 50;
+  
+          // Pindahkan pemain
+          player1.x += Math.cos(angle) * bounceBackDistance;
+          player1.y += Math.sin(angle) * bounceBackDistance;
+  
+          player2.x -= Math.cos(angle) * bounceBackDistance;
+          player2.y -= Math.sin(angle) * bounceBackDistance;
+
+          io.emit('collision', {
+            player1: playerId1,
+            player2: playerId2
+          });
+
+        }
+      }
+    }
+  }
+  
 
 
 
