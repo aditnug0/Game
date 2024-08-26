@@ -7,8 +7,9 @@ const scoreEl = document.querySelector('#scoreEl')
 
 const devicePixelRatio = window.devicePixelRatio || 1
 
-canvas.width = 1450 * devicePixelRatio
-canvas.height = 720 * devicePixelRatio
+canvas.width = window.innerWidth * devicePixelRatio
+canvas.height = window.innerHeight * devicePixelRatio
+
 
 c.scale(devicePixelRatio, devicePixelRatio)
 
