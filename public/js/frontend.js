@@ -7,6 +7,8 @@ const scoreEl = document.querySelector('#scoreEl')
 
 const devicePixelRatio = window.devicePixelRatio || 1
 
+// const aspecRatio = window.innerWidth / window.innerHeight
+
 canvas.width = window.innerWidth * devicePixelRatio
 canvas.height = window.innerHeight * devicePixelRatio
 
@@ -82,6 +84,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
         radius: 10,
         color: backEndPlayer.color,
         username: backEndPlayer.username
+
       })
 
       document.querySelector(
@@ -330,8 +333,8 @@ document.querySelector('#usernameForm').addEventListener('submit', (event) => {
   }
   else{
     socket.emit('initGame', {
-      width: canvas.width,
-      height: canvas.height,
+      width: canvas.width / devicePixelRatio,
+      height: canvas.height / devicePixelRatio,
       devicePixelRatio,
       username: user
     })

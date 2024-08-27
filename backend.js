@@ -73,12 +73,14 @@ io.on('connection', (socket) => {
   // hadle mulai game
   socket.on('initGame', ({ username, width, height }) => {
     backEndPlayers[socket.id] = {
-      x: 1024 * Math.random(),
-      y: 576 * Math.random(),
+      x: width * Math.random(),
+      y: height * Math.random(),
       color: `hsl(${360 * Math.random()}, 100%, 50%)`,
       sequenceNumber: 0,
       score: 0,
-      username
+      username, 
+      screenWidth: width,
+      screenHeight: height
     }
 
     // where we init our canvas
@@ -100,6 +102,9 @@ io.on('connection', (socket) => {
   // hadle key AWSD 
   socket.on('keydown', ({ keycode, sequenceNumber }) => {
     const backEndPlayer = backEndPlayers[socket.id]
+
+    // const screenWidth = window.innerWidth
+    // const screenHeight = window.innerHeight
 
     if (!backEndPlayers[socket.id]) return
 
@@ -131,12 +136,12 @@ io.on('connection', (socket) => {
 
     if (playerSides.left < 0) backEndPlayers[socket.id].x = backEndPlayer.radius
 
-    if (playerSides.right > 1024)
+    if (playerSides.right > backEndPlayer.screenWidth)
       backEndPlayers[socket.id].x = 1024 - backEndPlayer.radius
 
     if (playerSides.top < 0) backEndPlayers[socket.id].y = backEndPlayer.radius
 
-    if (playerSides.bottom > 576)
+    if (playerSides.bottom > backEndPlayer.screenHeight)
       backEndPlayers[socket.id].y = 576 - backEndPlayer.radius
   })
 })
