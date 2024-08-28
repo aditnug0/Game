@@ -28,20 +28,20 @@ let projectileId = 0
 // hadle coin in canvas
 function generateCoin() {
 
-  if (Object.keys(backEndCoins).length >= 2){
+  if (Object.keys(backEndCoins).length >= 5){
     return
   }
 
   const coinId = Math.random().toString(36).substring(2, 9);
   backEndCoins[coinId] = {
-    x: Math.random() * 1024,
-    y: Math.random() * 576,
+    x: Math.random() * 1500,
+    y: Math.random() * 800,
     radius: 8, // Radius koin
   };
 
 }
 // Menggenerate koin setiap 15 detik (interval bisa diatur)
-setInterval(generateCoin, 10000);
+setInterval(generateCoin, 5000);
 
 
 
@@ -137,12 +137,12 @@ io.on('connection', (socket) => {
     if (playerSides.left < 0) backEndPlayers[socket.id].x = backEndPlayer.radius
 
     if (playerSides.right > backEndPlayer.screenWidth)
-      backEndPlayers[socket.id].x = 1024 - backEndPlayer.radius
+      backEndPlayers[socket.id].x = backEndPlayer.screenWidth - backEndPlayer.radius
 
     if (playerSides.top < 0) backEndPlayers[socket.id].y = backEndPlayer.radius
 
     if (playerSides.bottom > backEndPlayer.screenHeight)
-      backEndPlayers[socket.id].y = 576 - backEndPlayer.radius
+      backEndPlayers[socket.id].y = backEndPlayer.screenHeight - backEndPlayer.radius
   })
 })
 
