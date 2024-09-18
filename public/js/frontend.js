@@ -1,3 +1,4 @@
+
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
@@ -21,6 +22,26 @@ const y = canvas.height / 2
 const frontEndPlayers = {}
 const frontEndProjectiles = {}
 const frontEndCoins = {}
+const frontEndNpcs ={}
+
+socket.on('updateNpcs', (backEndNpcs) => {
+  for(const id in backEndNpcs){
+    const backEndNpc = backEndNpcs[id]
+    if (!frontEndNpcs[id]) {
+      frontEndNpcs[id] = new Npc({
+        x: backEndNpc.x,
+        y: backEndNpc.y,
+        radius: backEndNpc.radius,
+        color: 'white', // warna koin
+      })
+    } else{
+      frontEndNpcs[id].target = {
+        x: backEndNpc.x,
+        y: backEndNpc.y
+      }
+    }
+  }
+})
 
 
 socket.on('updateCoins', (backEndCoins) => {
@@ -172,6 +193,30 @@ socket.on('collision', ({ player1, player2 }) => {
   console.log(`Collision detected between ${player1} and ${player2}`);
 });
 
+socket.on('npcCollision', ({ npc1, npc2, npc1color, npc2Color }) => {
+  
+  // Ubah warna NPC yang bertabrakan
+  if (frontEndNpcs[npc1]) {
+    frontEndNpcs[npc1].color = npc1color;
+  }
+
+  if (frontEndNpcs[npc2]){
+    frontEndNpcs[npc2].color =npc2Color
+  }
+});
+
+socket.on('NpcAndPlayerCollision', ({ player, npc, playerColor, npcColor }) => {
+  // Ubah warna player yang bertabrakan
+  if (frontEndPlayers[player]) {
+    frontEndPlayers[player].color = playerColor;
+  }
+
+  // Ubah warna NPC yang bertabrakan
+  if (frontEndNpcs[npc]) {
+    frontEndNpcs[npc].color = npcColor;
+  }
+});
+
 socket.on('eliminationNotification', (data) => {
   alert(data.message); // Menampilkan notifikasi eliminasi
 });
@@ -186,11 +231,17 @@ function updatePlayerColor(playerId, color) {
   }
 }
 
+function lerp(start, end, t) {
+  return start + (end - start) * t
+}
+
 let animationId
 function animate() {
   animationId = requestAnimationFrame(animate)
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)'
   c.clearRect(0, 0, canvas.width, canvas.height)
+
+
 
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id]
@@ -219,6 +270,23 @@ function animate() {
   for (const id in frontEndCoins) {
     const frontEndCoin = frontEndCoins[id]
     frontEndCoin.draw()
+  }
+
+  for (const id in frontEndNpcs){
+    const frontEndNpc = frontEndNpcs[id]
+
+    if (frontEndNpc.target) {
+    //   frontEndNpc.x = lerp(frontEndNpc.x, frontEndNpc.target.x, 0.1)
+    //   frontEndNpc.y = lerp(frontEndNpc.y, frontEndNpc.target.y, 0.1)
+
+    frontEndNpcs[id].x +=
+        (frontEndNpcs[id].target.x - frontEndNpcs[id].x) * 0.1
+      frontEndNpcs[id].y +=
+        (frontEndNpcs[id].target.y - frontEndNpcs[id].y) * 0.1
+
+    }
+
+    frontEndNpc.draw()
   }
 
 }
@@ -323,9 +391,8 @@ socket.on('updateScore', (score) => {
 
 document.querySelector('#usernameForm').addEventListener('submit', (event) => {
   event.preventDefault()
-  document.querySelector('#usernameForm').style.display = 'none'
    const user = document.querySelector('#usernameInput').value
-
+ document.querySelector('#usernameForm').style.display = 'none'
    //hadle username empty
   if (user == null || user == ""  ){
     alert("Username is empty")

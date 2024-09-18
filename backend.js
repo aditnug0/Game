@@ -5,10 +5,9 @@ const app = express()
 const http = require('http')
 const server = http.createServer(app)
 const { Server } = require('socket.io')
-const { CLIENT_RENEG_LIMIT } = require('tls')
 const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000 })
 
-const port = 3000
+const port = 5000
 
 app.use(express.static('public'))
 
@@ -19,6 +18,9 @@ app.get('/', (req, res) => {
 const backEndPlayers = {}
 const backEndProjectiles = {}
 const backEndCoins = {};
+const backEndNpcs = {};
+const NUM_NPCS = 2
+const NPC_SPEED = 3
 
 const SPEED = 5
 const RADIUS = 10
@@ -35,7 +37,7 @@ function generateCoin() {
   const coinId = Math.random().toString(36).substring(2, 9);
   backEndCoins[coinId] = {
     x: Math.random() * 1500,
-    y: Math.random() * 800,
+    y: Math.random() * 700,
     radius: 8, // Radius koin
   };
 
@@ -43,6 +45,48 @@ function generateCoin() {
 // Menggenerate koin setiap 15 detik (interval bisa diatur)
 setInterval(generateCoin, 5000);
 
+function getRandomColor() {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+function initializeNPCs() {
+  for (let i = 0; i < NUM_NPCS; i++) {
+    const npcId = `npc_${i}`;
+    const angle = Math.random() * Math.PI * 2;
+    backEndNpcs[npcId] = {
+      x: Math.random() * 1540, // Koordinat X NPC
+      y: Math.random() * 720, // Koordinat Y NPC
+      radius: 10, // Radius NPC
+      speedX: Math.cos(angle) * NPC_SPEED, // Kecepatan gerakan di sumbu X
+      speedY: Math.sin(angle) * NPC_SPEED, // Kecepatan gerakan di sumbu Y
+    };
+  }
+}
+
+initializeNPCs()
+
+function moveNPCs() {
+  for (const npcId in backEndNpcs) {
+    const npc = backEndNpcs[npcId];
+
+    // Update posisi NPC
+    npc.x += npc.speedX * 3;
+    npc.y += npc.speedY * 3;
+
+    // Pembatasan agar NPC tetap dalam area kanvas
+    if (npc.x < 0 || npc.x > 1540) {
+      npc.speedX *= -1; // Balik arah di sumbu X
+    }
+    if (npc.y < 0 || npc.y > 720) {
+      npc.speedY *= -1; // Balik arah di sumbu Y
+    }
+  }
+}
 
 
 
@@ -200,8 +244,8 @@ setInterval(() => {
   }
 
   // logic untuk player tabrakan
-  for (const playerId1 in backEndPlayers) {
-    for (const playerId2 in backEndPlayers) {
+    for (const playerId1 in backEndPlayers) {
+     for (const playerId2 in backEndPlayers) {
       if (playerId1 !== playerId2) {
         const player1 = backEndPlayers[playerId1];
         const player2 = backEndPlayers[playerId2];
@@ -234,11 +278,89 @@ setInterval(() => {
       }
     }
   }
+
+  //logic tabrakan npc
+  for (const npcId1 in backEndNpcs) {
+    const npc1 = backEndNpcs[npcId1];
   
+    for (const npcId2 in backEndNpcs) {
+      if (npcId1 !== npcId2) { // Menghindari perbandingan berulang
+        const npc2 = backEndNpcs[npcId2];
+  
+        const DISTANCE = Math.hypot(npc1.x - npc2.x, npc1.y - npc2.y);
+        const COMBINED_RADIUS = npc1.radius + npc2.radius;
+  
+        if (DISTANCE < COMBINED_RADIUS) {
+          // Hitung jarak pantulan
+          const dx = npc1.x - npc2.x;
+          const dy = npc1.y - npc2.y;
+  
+          // Hitung sudut pantulan
+          const angle = Math.atan2(dy, dx);
+          const bounceBackDistance = 30; // Atur jarak pantulan untuk NPC
+  
+          // Pindahkan kedua NPC setelah tabrakan
+          npc1.x += Math.cos(angle) * bounceBackDistance;
+          npc1.y += Math.sin(angle) * bounceBackDistance;
+  
+          npc2.x -= Math.cos(angle) * bounceBackDistance;
+          npc2.y -= Math.sin(angle) * bounceBackDistance;
+
+          npc1.color = getRandomColor();  
+          npc2.color = getRandomColor(); 
 
 
+  
+          // Emit event untuk tabrakan NPC
+          io.emit('npcCollision', {
+            npc1: npcId1,
+            npc2: npcId2,
+            npc1color: npc1.color,
+            npc2color: npc2.color
+          });
+        }
+      }
+    }
+  }
 
+ // Logic NPC tabrakan dengan player
+for (const playerId in backEndPlayers) {
+  const player = backEndPlayers[playerId];
 
+  for (const npcId in backEndNpcs) {
+    const npc = backEndNpcs[npcId];
+
+    const DISTANCE = Math.hypot(player.x - npc.x, player.y - npc.y);
+    const COMBINED_RADIUS = player.radius + npc.radius;
+
+    if (DISTANCE < COMBINED_RADIUS) {
+      // Hitung jarak pantulan
+      const dx = player.x - npc.x;
+      const dy = player.y - npc.y;
+
+      // Hitung sudut pantulan
+      const angle = Math.atan2(dy, dx);
+      const bounceBackDistance = 30; 
+
+      // Pindahkan player sedikit menjauh dari npc
+      player.x += Math.cos(angle) * bounceBackDistance;
+      player.y += Math.sin(angle) * bounceBackDistance;
+
+      player.color = getRandomColor();  
+      npc.color = getRandomColor(); 
+
+      // Emit event untuk tabrakan NPC dan Player
+      io.emit('NpcAndPlayerCollision', {
+        player: playerId,
+        npc: npcId,
+        playerColor: player.color,
+        npcColor: npc.color,
+      });
+    }
+  }
+}
+
+  
 
 // logic untuk koin dan ganti warna
 let collectId  // untuk menampung id player pick coin 
@@ -271,12 +393,15 @@ let collectId  // untuk menampung id player pick coin
     }
   }
 
+  moveNPCs()
+
   // update ke klien untuk realtime 
   io.emit('updateProjectiles', backEndProjectiles)
   io.emit('updatePlayers', backEndPlayers)
   io.emit('updateCoins', backEndCoins)
+  io.emit('updateNpcs', backEndNpcs);
 
-}, 15)
+}, 30)
 
 // Port server
 server.listen(port, () => {
