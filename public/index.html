@@ -6,6 +6,9 @@
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeLegibility;
         margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         background: #94a3b8;
       }
 
@@ -14,10 +17,22 @@
       }
 
       canvas {
-        width: 100vw;
-        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-items: center;
+        width: 1400px;
+        height: 700px;
         background-image: url('/img/webb-dark.png');
+        margin: 0;
       }
+
+      .bg-gray {
+        width: 200px; /* Sesuaikan ukuran yang diinginkan */
+        height: 200px;
+        background-color: #922e2e; /* Warna abu-abu */
+        border-radius: 8px; /* Tambahkan border-radius jika diperlukan */
+      }
+
     </style>
   </head>
   <body style="display: flex">
@@ -36,8 +51,8 @@
         <div style="margin-bottom: 8px">Leaderboard</div>
         <div id="playerLabels"></div>
       </div>
-      <canvas></canvas>
 
+      <canvas width="1400" height="700"></canvas>
       <!-- username input -->
       <div
         style="
@@ -99,8 +114,9 @@
     <script src="./js/classes/Enemy.js"></script>
     <script src="./js/classes/Player.js"></script>
     <script src="./js/classes/Particle.js"></script>
-    <script src="./js/classes/Projectile.js"></script>
+    <!-- <script src="./js/classes/Projectile.js"></script> -->
     <script src="./js/classes/Coin.js"></script>
+    <script src="./js/classes/Wall.js"></script>
     <script src="./js/classes/Npc.js"></script>
     <script src="./js/frontend.js"></script>
     <script src="./js/eventListeners.js"></script>

@@ -10,8 +10,8 @@ const devicePixelRatio = window.devicePixelRatio || 1
 
 // const aspecRatio = window.innerWidth / window.innerHeight
 
-canvas.width = window.innerWidth * devicePixelRatio
-canvas.height = window.innerHeight * devicePixelRatio
+canvas.width = 1400 * devicePixelRatio
+canvas.height = 700 * devicePixelRatio
 
 
 c.scale(devicePixelRatio, devicePixelRatio)
@@ -23,6 +23,7 @@ const frontEndPlayers = {}
 const frontEndProjectiles = {}
 const frontEndCoins = {}
 const frontEndNpcs ={}
+const frontEndWall ={}
 
 socket.on('updateNpcs', (backEndNpcs) => {
   for(const id in backEndNpcs){
@@ -65,6 +66,22 @@ socket.on('updateCoins', (backEndCoins) => {
   }
 })
 
+socket.on('updateWall', (backEndWall) => {
+  console.log('Received walls:', backEndWall); 
+  for (const id in backEndWall) {
+    const wallData = backEndWall[id]
+
+    if (!frontEndWall[id]) {
+      frontEndWall[id] = new Wall({
+        x: wallData.x,
+        y: wallData.y,
+        width: 100,
+        height: 100,
+      })
+    }
+  }
+
+})
 
 
 socket.on('updateProjectiles', (backEndProjectiles) => {
@@ -240,6 +257,11 @@ function animate() {
   animationId = requestAnimationFrame(animate)
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)'
   c.clearRect(0, 0, canvas.width, canvas.height)
+
+
+  for (const id in frontEndWall) {
+    frontEndWall[id].draw(c);
+  }
 
 
 

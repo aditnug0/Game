@@ -19,6 +19,13 @@ const backEndPlayers = {}
 const backEndProjectiles = {}
 const backEndCoins = {};
 const backEndNpcs = {};
+
+const backEndWall= {
+  wall1: { x: 50,  y: 100, width: 100, height: 100 }, 
+  wall3: { x: 500, y: 450, width: 100, height: 100 },
+  wall5: { x: 1100, y: 100, width: 100, height: 100 },
+}
+
 const NUM_NPCS = 2
 const NPC_SPEED = 3
 
@@ -27,6 +34,88 @@ const RADIUS = 10
 const PROJECTILE_RADIUS = 5
 let projectileId = 0
 
+
+function isCoinInWall(coin, walls) {
+  for (const id in walls) {
+    const wall = walls[id];
+    // Cek apakah koin berada di dalam area dinding (koordinat X dan Y)
+    if (
+      coin.x + coin.radius > wall.x && // Ujung kanan koin melewati ujung kiri dinding
+      coin.x - coin.radius < wall.x + 100 && // Ujung kiri koin melewati ujung kanan dinding
+      coin.y + coin.radius > wall.y && // Ujung bawah koin melewati ujung atas dinding
+      coin.y - coin.radius < wall.y + 100 // Ujung atas koin melewati ujung bawah dinding
+    ) {
+      return true; // Tabrakan terjadi
+    }
+  }
+  return false; // Tidak ada tabrakan
+}
+
+function checkCollisionWithWalls(npc) {
+  for (const id in backEndWall) {
+    const wall = backEndWall[id];
+    if (
+      npc.x + npc.radius > wall.x && // Ujung kanan pemain melewati ujung kiri dinding
+      npc.x - npc.radius < wall.x + wall.width && // Ujung kiri pemain melewati ujung kanan dinding
+      npc.y + npc.radius > wall.y && // Ujung bawah pemain melewati ujung atas dinding
+      npc.y - npc.radius < wall.y + wall.height // Ujung atas pemain melewati ujung bawah dinding
+    ) {
+      // Jika NPC menabrak dinding, ubah posisi dan arah gerakan
+      if (npc.x + npc.radius > wall.x && npc.x - npc.radius < wall.x + wall.width) {
+        if (npc.x > wall.x + wall.width / 2) {
+            // NPC berada di sisi kanan dinding, mantulkan ke kanan
+            npc.x = wall.x + wall.width + npc.radius;
+        } else {
+            // NPC berada di sisi kiri dinding, mantulkan ke kiri
+            npc.x = wall.x - npc.radius;
+        }
+    }
+    
+    // Cek apakah NPC bertabrakan dengan sisi atas atau bawah dinding
+    if (npc.y + npc.radius > wall.y && npc.y - npc.radius < wall.y + wall.height) {
+        if (npc.y > wall.y + wall.height / 2) {
+            // NPC berada di sisi bawah dinding, mantulkan ke bawah
+            npc.y = wall.y + wall.height + npc.radius;
+        } else {
+            // NPC berada di sisi atas dinding, mantulkan ke atas
+            npc.y = wall.y - npc.radius;
+        }
+    }
+
+      npc.speedX *= -1;
+      npc.speedY *= -1;
+
+    }
+
+  }
+}
+
+function checkCollisionWithWalls(player) {
+  for (const id in backEndWall) {
+    const wall = backEndWall[id];
+    // Cek apakah pemain menyentuh dinding
+    if (
+      player.x + player.radius > wall.x && // Ujung kanan pemain melewati ujung kiri dinding
+      player.x - player.radius < wall.x + wall.width && // Ujung kiri pemain melewati ujung kanan dinding
+      player.y + player.radius > wall.y && // Ujung bawah pemain melewati ujung atas dinding
+      player.y - player.radius < wall.y + wall.height // Ujung atas pemain melewati ujung bawah dinding
+    ) {
+      // Jika pemain menabrak dinding, atur ulang posisi agar berada di luar dinding
+      if (player.x + player.radius > wall.x && player.x < wall.x) {
+        player.x = wall.x - player.radius; // Pemain berada di kiri dinding
+      } else if (player.x - player.radius < wall.x + wall.width && player.x > wall.x + wall.width) {
+        player.x = wall.x + wall.width + player.radius; // Pemain berada di kanan dinding
+      }
+      if (player.y + player.radius > wall.y && player.y < wall.y) {
+        player.y = wall.y - player.radius; // Pemain berada di atas dinding
+      } else if (player.y - player.radius < wall.y + wall.height && player.y > wall.y + wall.height) {
+        player.y = wall.y + wall.height + player.radius; // Pemain berada di bawah dinding
+      }
+    }
+  }
+}
+
+
 // hadle coin in canvas
 function generateCoin() {
 
@@ -34,14 +123,22 @@ function generateCoin() {
     return
   }
 
-  const coinId = Math.random().toString(36).substring(2, 9);
-  backEndCoins[coinId] = {
-    x: Math.random() * 1500,
-    y: Math.random() * 700,
-    radius: 8, // Radius koin
-  };
+  let coinId
+  let newCoin
 
+  do {
+    coinId = Math.random().toString(36).substring(2, 9);
+    newCoin = {
+      x: Math.random() * 1400,
+      y: Math.random() * 700,
+      radius: 8, // Radius koin
+    };
+  } while (isCoinInWall(newCoin, backEndWall)); // Ulangi jika koin bertabrakan dengan dinding
+
+  // Setelah posisi valid, tambahkan koin ke dalam backEndCoins
+  backEndCoins[coinId] = newCoin;
 }
+
 // Menggenerate koin setiap 15 detik (interval bisa diatur)
 setInterval(generateCoin, 5000);
 
@@ -59,8 +156,8 @@ function initializeNPCs() {
     const npcId = `npc_${i}`;
     const angle = Math.random() * Math.PI * 2;
     backEndNpcs[npcId] = {
-      x: Math.random() * 1540, // Koordinat X NPC
-      y: Math.random() * 720, // Koordinat Y NPC
+      x: Math.random() * 1300, // Koordinat X NPC
+      y: Math.random() * 650, // Koordinat Y NPC
       radius: 10, // Radius NPC
       speedX: Math.cos(angle) * NPC_SPEED, // Kecepatan gerakan di sumbu X
       speedY: Math.sin(angle) * NPC_SPEED, // Kecepatan gerakan di sumbu Y
@@ -79,12 +176,13 @@ function moveNPCs() {
     npc.y += npc.speedY * 3;
 
     // Pembatasan agar NPC tetap dalam area kanvas
-    if (npc.x < 0 || npc.x > 1540) {
+    if (npc.x < 0 || npc.x > 1400) {
       npc.speedX *= -1; // Balik arah di sumbu X
     }
-    if (npc.y < 0 || npc.y > 720) {
+    if (npc.y < 0 || npc.y > 700) {
       npc.speedY *= -1; // Balik arah di sumbu Y
     }
+    checkCollisionWithWalls(npc)
   }
 }
 
@@ -94,6 +192,8 @@ io.on('connection', (socket) => {
   console.log('a user connected')
 
   io.emit('updatePlayers', backEndPlayers)
+
+  io.emit('updateWall', backEndWall)
 
   // hadle shoot player
   socket.on('shoot', ({ x, y, angle }) => {
@@ -115,23 +215,21 @@ io.on('connection', (socket) => {
   })
 
   // hadle mulai game
-  socket.on('initGame', ({ username, width, height }) => {
+  socket.on('initGame', ({ username }) => {
     backEndPlayers[socket.id] = {
-      x: width * Math.random(),
-      y: height * Math.random(),
+      x: 1400 * Math.random(),
+      y: 800 * Math.random(),
       color: `hsl(${360 * Math.random()}, 100%, 50%)`,
       sequenceNumber: 0,
       score: 0,
       username, 
-      screenWidth: width,
-      screenHeight: height
     }
 
     // where we init our canvas
-    backEndPlayers[socket.id].canvas = {
-      width,
-      height
-    }
+    // backEndPlayers[socket.id].canvas = {
+    //   width,
+    //   height
+    // }
 
     backEndPlayers[socket.id].radius = RADIUS
   })
@@ -180,13 +278,16 @@ io.on('connection', (socket) => {
 
     if (playerSides.left < 0) backEndPlayers[socket.id].x = backEndPlayer.radius
 
-    if (playerSides.right > backEndPlayer.screenWidth)
-      backEndPlayers[socket.id].x = backEndPlayer.screenWidth - backEndPlayer.radius
+    if (playerSides.right > 1400)
+      backEndPlayers[socket.id].x = 1400 - backEndPlayer.radius
 
     if (playerSides.top < 0) backEndPlayers[socket.id].y = backEndPlayer.radius
 
-    if (playerSides.bottom > backEndPlayer.screenHeight)
-      backEndPlayers[socket.id].y = backEndPlayer.screenHeight - backEndPlayer.radius
+    if (playerSides.bottom > 700)
+      backEndPlayers[socket.id].y = 700 - backEndPlayer.radius
+
+    checkCollisionWithWalls(backEndPlayers[socket.id])
+
   })
 })
 
@@ -297,7 +398,7 @@ setInterval(() => {
   
           // Hitung sudut pantulan
           const angle = Math.atan2(dy, dx);
-          const bounceBackDistance = 30; // Atur jarak pantulan untuk NPC
+          const bounceBackDistance = 10; // Atur jarak pantulan untuk NPC
   
           // Pindahkan kedua NPC setelah tabrakan
           npc1.x += Math.cos(angle) * bounceBackDistance;
@@ -393,15 +494,19 @@ let collectId  // untuk menampung id player pick coin
     }
   }
 
+  
+  
+  
   moveNPCs()
 
   // update ke klien untuk realtime 
   io.emit('updateProjectiles', backEndProjectiles)
   io.emit('updatePlayers', backEndPlayers)
   io.emit('updateCoins', backEndCoins)
-  io.emit('updateNpcs', backEndNpcs);
+  io.emit('updateNpcs', backEndNpcs)
+  io.emit('updateWall', backEndWall)
 
-}, 30)
+}, 20)
 
 // Port server
 server.listen(port, () => {
