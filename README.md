@@ -1,17 +1,17 @@
 # 🎉 GAME WEB MULTIPLAYER
 
-Sebuah website game multiplayer menggunakan Node.js dan Socket.io di mana player bisa bergerak, menembak, mengumpulkan koin, dan berinteraksi dengan Non-Player Characters (NPC)
+A website about a multiplayer game using Node.js and Socket.io where players can move, shoot, collect coins, and interact with a Non-Playable-Character (NPC)
 
 ## ✨ Features
 
-- **Multiplayer dengan Socket.io** –  Player bisa bergabung dalam satu ruangan untuk bermain bersama secara real-time.
-- **Leaderboard Real-Time** –  Leaderboard yang terus diperbarui secara real-time.
-- **Collision Detection untuk Player dan NPC** – Player atau NPC bisa bertabrakan dengan dinding atau objek lain di dalam game.
-- **Coin Collection Mechanic** – Player bisa mengumpulkan koin yang muncul di arena.
-- **NPC Movement** – NPC bergerak dengan kecepatan yang seragam dan memiliki logika untuk menghindari dinding dengan cara memantul ketika menyentuhnya.
-- **Real-time Player Movement** – Player dapat bergerak dalam game menggunakan input dari keyboard, dan gerakan mereka disinkronkan secara real-time menggunakan Socket.io.
-- **Bounce Back Mechanism for Players** – Player akan berhenti ketika menyentuh tembok, alih-alih menembusnya.
-- **Projectile System (on progress)** – Player dapat menembakkan proyektil.
+- **Multiplayer with Socket.io** –  Players can join in a room with multiple players at real time.
+- **Real-Time Leaderboard** –  Leaderboard that is constantly updated in real time.
+- **Collision Detection for Player and NPC** – Player or NPC can collide with walls or other objects in the game.
+- **Coin Collection Mechanic** – Players can collect coins that show at the arena.
+- **NPC Movement** – NPC moves with the same speed and have the logic to avoid wall with bouncing on it.
+- **Real-time Player Movement** – Players can move in game using the input from the keyboard, and their moves is synchronized in real time using Socket.io.
+- **Bounce Back Mechanism for Players** – Player will stop when collide with the walls, instead of phasing through.
+- **Projectile System (on progress)** – Player can shoot projectiles.
   
 ## ⚙️ How It Works
 
@@ -55,25 +55,25 @@ Sebuah website game multiplayer menggunakan Node.js dan Socket.io di mana player
 / (Root Directory)
 │
 ├── public/
-│   └── img/             # Folder untuk menyimpan gambar atau aset statis lainnya
+│   └── img/             # Folder for saving images or other assets
 │
-├── js/                  # Folder utama untuk file JavaScript
-│   ├── classes/         # Folder untuk file class
+├── js/                  # Main folder for the file JavaScript
+│   ├── classes/         # Folder for file class
 │   │   ├── Coin.js
 │   │   ├── Npc.js
 │   │   ├── Player.js
 │   │   ├── Projectile.js
 │   │   ├── Wall.js
 │   │
-│   ├── eventListeners.js # File untuk mengatur eventlistener
-│   ├── frontend.js       # File utama untuk logika frontend
-│   ├── index.html        # File HTML utama
+│   ├── eventListeners.js # File for controlling eventlistener
+│   ├── frontend.js       # Main file for the frontend logic
+│   ├── index.html        # Main HTML file  
 │
-├── .gitignore           # File konfigurasi untuk mengabaikan file dalam version control
-├── backend.js           # File untuk logika backend
-├── package-lock.json    # File yang mengunci versi dependensi proyek
-├── package.json         # File konfigurasi untuk dependensi dan script npm
-└── README.md            # Dokumentasi proyek
+├── .gitignore           # Configurator file for ignoring the file that in version control
+├── backend.js           # Backend logic file
+├── package-lock.json    # File that lock project dependency version
+├── package.json         # Configurator for dependency and npm script 
+└── README.md            # Project documentations
 ```
 
 ## 💥 EXAMPLE CODE
