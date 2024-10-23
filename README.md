@@ -28,11 +28,20 @@ Sebuah website game multiplayer menggunakan Node.js dan Socket.io di mana player
 
 ## 🚀 Quick Start
 
-1. **Clone this repository**:
+1. **Preparation**: Make sure you have Node.js (v14 or higher) and npm installed.
+2. **Clone this repository**:
 
    ```bash
    git clone https://github.com/aditnug0/Game.git
    ```
 
-2. **Open the project**: Navigate to the project folder, open terminal and run command `nodemon or npm run start` and open `localhost:5000` in your web browser.
-
+3. **Open the project**: Navigate to the project folder.
+4. **Install dependencies**: Open terminal and write command `npm i ` or `npm install`
+   ```bash
+   npm install
+   ```
+5. **Running the program**: To start the server, open terminal with command `nodemon` or `npm run start`
+  ```bash
+  npm run start
+  ```
+6. **See the program**: Then, open your browser and go to `http://localhost:5000`.
