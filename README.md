@@ -51,6 +51,7 @@ Sebuah website game multiplayer menggunakan Node.js dan Socket.io di mana player
 6. **See the program**: Then, open your browser and go to `http://localhost:5000`.
 
 ## 📁 Project Structure
+```
 / (Root Directory)
 │
 ├── public/
@@ -73,7 +74,7 @@ Sebuah website game multiplayer menggunakan Node.js dan Socket.io di mana player
 ├── package-lock.json    # File yang mengunci versi dependensi proyek
 ├── package.json         # File konfigurasi untuk dependensi dan script npm
 └── README.md            # Dokumentasi proyek
-
+```
 
 ## 💥 EXAMPLE CODE
 
