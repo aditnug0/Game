@@ -13,7 +13,7 @@ A website about a multiplayer game using Node.js and Socket.io where players can
 - **Bounce Back Mechanism for Players** – Player will stop when collide with the walls, instead of phasing through.
 - **Projectile System (on progress)** – Player can shoot projectiles.
   
-## ⚙️ How It Works
+## ⚙️ How To Play
 
 1. **Enter the Game Room**: Start by entering your username on the homepage.
 2. **Control Your Character**:
