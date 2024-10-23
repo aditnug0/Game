@@ -1,3 +1,5 @@
+
+// object player
 class Player {
   constructor({ x, y, radius, color, username }) {
     this.x = x

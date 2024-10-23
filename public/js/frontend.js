@@ -1,14 +1,13 @@
-
+// variable canvas
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
-
+// inisiai socket front end
 const socket = io()
-
+// variable score
 const scoreEl = document.querySelector('#scoreEl')
-
+// variable dedevicePixelRatio
 const devicePixelRatio = window.devicePixelRatio || 1
 
-// const aspecRatio = window.innerWidth / window.innerHeight
 
 canvas.width = 1400 * devicePixelRatio
 canvas.height = 700 * devicePixelRatio
@@ -19,12 +18,14 @@ c.scale(devicePixelRatio, devicePixelRatio)
 const x = canvas.width / 2
 const y = canvas.height / 2
 
+// inisiasi variable front end
 const frontEndPlayers = {}
 const frontEndProjectiles = {}
 const frontEndCoins = {}
 const frontEndNpcs ={}
 const frontEndWall ={}
 
+// handle update dari backend npc  
 socket.on('updateNpcs', (backEndNpcs) => {
   for(const id in backEndNpcs){
     const backEndNpc = backEndNpcs[id]
@@ -33,7 +34,7 @@ socket.on('updateNpcs', (backEndNpcs) => {
         x: backEndNpc.x,
         y: backEndNpc.y,
         radius: backEndNpc.radius,
-        color: 'white', // warna koin
+        color: 'white', 
       })
     } else{
       frontEndNpcs[id].target = {
@@ -44,7 +45,7 @@ socket.on('updateNpcs', (backEndNpcs) => {
   }
 })
 
-
+// handle update dari backend coin
 socket.on('updateCoins', (backEndCoins) => {
   for (const id in backEndCoins) {
     const backEndCoin = backEndCoins[id]
@@ -66,6 +67,7 @@ socket.on('updateCoins', (backEndCoins) => {
   }
 })
 
+// handle update dari backend wall  
 socket.on('updateWall', (backEndWall) => {
   console.log('Received walls:', backEndWall); 
   for (const id in backEndWall) {
@@ -83,7 +85,7 @@ socket.on('updateWall', (backEndWall) => {
 
 })
 
-
+// handle update dari backend projectile
 socket.on('updateProjectiles', (backEndProjectiles) => {
   for (const id in backEndProjectiles) {
     const backEndProjectile = backEndProjectiles[id]
@@ -110,7 +112,7 @@ socket.on('updateProjectiles', (backEndProjectiles) => {
 })
 
 
-// bug di sini coin sama kill masih nyampur
+// handle update dari backend player 
 socket.on('updatePlayers', (backEndPlayers) => {
   for (const id in backEndPlayers) {
     const backEndPlayer = backEndPlayers[id]
@@ -183,7 +185,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
     }
   }
 
-  // this is where we delete frontend players
+  // handle form input username
   for (const id in frontEndPlayers) {
     if (!backEndPlayers[id]) {
       const divToDelete = document.querySelector(`div[data-id="${id}"]`)
@@ -206,10 +208,12 @@ socket.on('updatePlayers', (backEndPlayers) => {
 
 })
 
+// handle tabrakan antar player 
 socket.on('collision', ({ player1, player2 }) => {
   console.log(`Collision detected between ${player1} and ${player2}`);
 });
 
+// handle tabrakan antar npc 
 socket.on('npcCollision', ({ npc1, npc2, npc1color, npc2Color }) => {
   
   // Ubah warna NPC yang bertabrakan
@@ -222,6 +226,7 @@ socket.on('npcCollision', ({ npc1, npc2, npc1color, npc2Color }) => {
   }
 });
 
+// handle tabrakan antar player dan npc
 socket.on('NpcAndPlayerCollision', ({ player, npc, playerColor, npcColor }) => {
   // Ubah warna player yang bertabrakan
   if (frontEndPlayers[player]) {
@@ -234,6 +239,7 @@ socket.on('NpcAndPlayerCollision', ({ player, npc, playerColor, npcColor }) => {
   }
 });
 
+// handle notifikasi elimination
 socket.on('eliminationNotification', (data) => {
   alert(data.message); // Menampilkan notifikasi eliminasi
 });
@@ -248,23 +254,18 @@ function updatePlayerColor(playerId, color) {
   }
 }
 
-function lerp(start, end, t) {
-  return start + (end - start) * t
-}
-
+// function untuk menampilakan semua evirotment game di canvas
 let animationId
 function animate() {
   animationId = requestAnimationFrame(animate)
   // c.fillStyle = 'rgba(0, 0, 0, 0.1)'
   c.clearRect(0, 0, canvas.width, canvas.height)
 
-
+  // draw wall
   for (const id in frontEndWall) {
     frontEndWall[id].draw(c);
   }
-
-
-
+  //draw player 
   for (const id in frontEndPlayers) {
     const frontEndPlayer = frontEndPlayers[id]
 
@@ -278,29 +279,21 @@ function animate() {
 
     frontEndPlayer.draw()
   }
-
+  // draw projectile
   for (const id in frontEndProjectiles) {
     const frontEndProjectile = frontEndProjectiles[id]
     frontEndProjectile.draw()
   }
-
-  // for (let i = frontEndProjectiles.length - 1; i >= 0; i--) {
-  //   const frontEndProjectile = frontEndProjectiles[i]
-  //   frontEndProjectile.update()
-  // }
-
+  // draw coin
   for (const id in frontEndCoins) {
     const frontEndCoin = frontEndCoins[id]
     frontEndCoin.draw()
   }
-
+  // draw npc
   for (const id in frontEndNpcs){
     const frontEndNpc = frontEndNpcs[id]
 
     if (frontEndNpc.target) {
-    //   frontEndNpc.x = lerp(frontEndNpc.x, frontEndNpc.target.x, 0.1)
-    //   frontEndNpc.y = lerp(frontEndNpc.y, frontEndNpc.target.y, 0.1)
-
     frontEndNpcs[id].x +=
         (frontEndNpcs[id].target.x - frontEndNpcs[id].x) * 0.1
       frontEndNpcs[id].y +=
@@ -315,6 +308,7 @@ function animate() {
 
 animate()
 
+// variabel untuk setting player diam
 const keys = {
   w: {
     pressed: false
@@ -333,6 +327,8 @@ const keys = {
 const SPEED = 5
 const playerInputs = []
 let sequenceNumber = 0
+
+// handle pergerakan player
 setInterval(() => {
   if (keys.w.pressed) {
     sequenceNumber++
@@ -362,6 +358,7 @@ setInterval(() => {
     socket.emit('keydown', { keycode: 'KeyD', sequenceNumber })
   }
 }, 15)
+
 
 window.addEventListener('keydown', (event) => {
   if (!frontEndPlayers[socket.id]) return
@@ -406,11 +403,12 @@ window.addEventListener('keyup', (event) => {
       break
   }
 })
-
+  // handle score dari backend untuk frontend
 socket.on('updateScore', (score) => {
   document.querySelector('#coinScore').innerText = `Coins: ${score}`
 })
 
+  // handle start game
 document.querySelector('#usernameForm').addEventListener('submit', (event) => {
   event.preventDefault()
    const user = document.querySelector('#usernameInput').value

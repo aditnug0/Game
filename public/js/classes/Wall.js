@@ -1,3 +1,5 @@
+
+// objeck wall 
 class Wall {
     constructor({ x, y, width, height }) {
       this.x = x

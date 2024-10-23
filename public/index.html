@@ -1,6 +1,7 @@
 <html>
   <head>
     <style>
+      /* style for body / cnavas di tengah */
       body {
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -15,7 +16,7 @@
       input::placeholder {
         color: #94a3b8;
       }
-
+      /* style canvas  */
       canvas {
         display: flex;
         align-items: center;
@@ -26,20 +27,14 @@
         margin: 0;
       }
 
-      .bg-gray {
-        width: 200px; /* Sesuaikan ukuran yang diinginkan */
-        height: 200px;
-        background-color: #922e2e; /* Warna abu-abu */
-        border-radius: 8px; /* Tambahkan border-radius jika diperlukan */
-      }
+      
 
     </style>
   </head>
   <body style="display: flex">
     <div>
       <div
-        style="
-          position: absolute;
+        style=" position: absolute;
           color: white;
           padding: 8px;
           font-family: sans-serif;
@@ -110,11 +105,12 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
+
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    <script src="./js/classes/Enemy.js"></script>
+   
+    <!-- inisiasi object  -->
     <script src="./js/classes/Player.js"></script>
-    <script src="./js/classes/Particle.js"></script>
-    <!-- <script src="./js/classes/Projectile.js"></script> -->
+    <script src="./js/classes/Projectile.js"></script>
     <script src="./js/classes/Coin.js"></script>
     <script src="./js/classes/Wall.js"></script>
     <script src="./js/classes/Npc.js"></script>

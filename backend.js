@@ -7,6 +7,7 @@ const server = http.createServer(app)
 const { Server } = require('socket.io')
 const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000 })
 
+// Server
 const port = 5000
 
 app.use(express.static('public'))
@@ -35,6 +36,7 @@ const PROJECTILE_RADIUS = 5
 let projectileId = 0
 
 
+// funtion for checking coin in a wall
 function isCoinInWall(coin, walls) {
   for (const id in walls) {
     const wall = walls[id];
@@ -51,6 +53,8 @@ function isCoinInWall(coin, walls) {
   return false; // Tidak ada tabrakan
 }
 
+
+// funtion checking npc menabrak dinding
 function checkCollisionWithWalls(npc) {
   for (const id in backEndWall) {
     const wall = backEndWall[id];
@@ -90,6 +94,7 @@ function checkCollisionWithWalls(npc) {
   }
 }
 
+// funtion checking player menabrak dinding
 function checkCollisionWithWalls(player) {
   for (const id in backEndWall) {
     const wall = backEndWall[id];
@@ -116,7 +121,7 @@ function checkCollisionWithWalls(player) {
 }
 
 
-// hadle coin in canvas
+// funtion handle generate coin di canvas 
 function generateCoin() {
 
   if (Object.keys(backEndCoins).length >= 5){
@@ -142,6 +147,8 @@ function generateCoin() {
 // Menggenerate koin setiap 15 detik (interval bisa diatur)
 setInterval(generateCoin, 5000);
 
+
+// funtion hadle generate random color for npc
 function getRandomColor() {
   const letters = '0123456789ABCDEF';
   let color = '#';
@@ -151,6 +158,7 @@ function getRandomColor() {
   return color;
 }
 
+// funtion generate npc di canvas
 function initializeNPCs() {
   for (let i = 0; i < NUM_NPCS; i++) {
     const npcId = `npc_${i}`;
@@ -167,6 +175,7 @@ function initializeNPCs() {
 
 initializeNPCs()
 
+// function hadle move npc
 function moveNPCs() {
   for (const npcId in backEndNpcs) {
     const npc = backEndNpcs[npcId];
@@ -186,8 +195,7 @@ function moveNPCs() {
   }
 }
 
-
-
+// socket io events
 io.on('connection', (socket) => {
   console.log('a user connected')
 
@@ -224,13 +232,6 @@ io.on('connection', (socket) => {
       score: 0,
       username, 
     }
-
-    // where we init our canvas
-    // backEndPlayers[socket.id].canvas = {
-    //   width,
-    //   height
-    // }
-
     backEndPlayers[socket.id].radius = RADIUS
   })
 
@@ -241,12 +242,9 @@ io.on('connection', (socket) => {
     io.emit('updatePlayers', backEndPlayers)
   })
 
-  // hadle key AWSD 
+  // hadle key movenpc AWSD 
   socket.on('keydown', ({ keycode, sequenceNumber }) => {
     const backEndPlayer = backEndPlayers[socket.id]
-
-    // const screenWidth = window.innerWidth
-    // const screenHeight = window.innerHeight
 
     if (!backEndPlayers[socket.id]) return
 
@@ -292,8 +290,7 @@ io.on('connection', (socket) => {
 })
 
 
-// pengaturan logic game
-
+// setting logic game
 setInterval(() => {
   // update projectile positions
   for (const id in backEndProjectiles) {
@@ -460,8 +457,6 @@ for (const playerId in backEndPlayers) {
     }
   }
 }
-
-  
 
 // logic untuk koin dan ganti warna
 let collectId  // untuk menampung id player pick coin 

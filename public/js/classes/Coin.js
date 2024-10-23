@@ -1,3 +1,5 @@
+
+// object coin
 class Coin {
     constructor({ x, y, radius, color }) {
       this.x = x

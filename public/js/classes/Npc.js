@@ -1,3 +1,5 @@
+
+// object npc
 class Npc {
     constructor({ x, y, radius, color, }) {
       this.x = x
