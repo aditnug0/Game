@@ -8,7 +8,7 @@ class Projectile {
     this.color = color
     this.velocity = velocity
   }
-
+// method untuk menggambar di frontend
   draw() {
     c.save()
     c.shadowColor = this.color

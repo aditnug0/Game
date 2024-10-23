@@ -8,9 +8,9 @@ class Player {
     this.color = color
     this.username = username
   }
-
+// method untuk menggambar di frontend
   draw() {
-    // username plyer
+    // setup username player
     c.font = '12px sans-serif'
     c.fillStyle = 'white'
     c.fillText(this.username, this.x - 10, this.y + 20)

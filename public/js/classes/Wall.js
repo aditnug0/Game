@@ -7,7 +7,7 @@ class Wall {
       this.width = width
       this.height = height
     }
-  
+  // method untuk menggambar di frontend
     draw() {
       c.beginPath()
       c.fillStyle = '#FF0000'
